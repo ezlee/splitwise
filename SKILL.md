@@ -1,79 +1,40 @@
-# Git Release Management Skill
+---
+name: git-release
+description: Create consistent releases, changelogs, and GitHub releases. Use when preparing a tagged release, generating release notes, or bumping versions semantically.
+license: MIT
+compatibility: opencode
+metadata:
+  audience: maintainers
+  workflow: github
+permissions:
+  read: allow
+  write: ask
+  shell: allow
+---
 
-This skill provides automated git release management functionality, including pushing the latest commits to the remote repository.
+# GitHub Release Expert
 
-## Overview
+## When to Use Me
+- User mentions "release", "tag", "changelog", "version bump", "prepare release", or "create new version"
+- Current branch is main/master and has new commits since last tag
 
-The Git Release Management Skill helps manage version releases and deployment by ensuring all local commits are pushed to the remote repository. It handles common git operations required for releasing code changes.
+## Core Process (Follow Strictly in Order)
+1. **Analyze Changes** 
+   Run `git log --oneline $(git describe --tags --abbrev=0 HEAD^)..HEAD` to see commits since last tag. 
+   Summarize in Conventional Commits style.
 
-## Features
+2. **Propose Version Bump** 
+   Analyze commit types: 
+   - Major (breaking): BREAKING CHANGE or feat with ! 
+   - Minor: feat 
+   - Patch: fix, refactor, docs, test, chore 
+   Ask user to confirm proposed bump (e.g., 1.2.3 → 1.3.0).
 
-- **Status Check**: Verify current git status before operations
-- **Commit Management**: Stage and commit pending changes
-- **Push Operations**: Push latest commits to remote repository
-- **Release Tagging**: Create version tags for releases
-- **Branch Management**: Handle different branches for releases
+3. **Generate Changelog** 
+   Group commits by type. Use clean, professional language. 
+   Output in markdown format suitable for GitHub Releases.
 
-## Usage
-
-### Basic Push Operation
-
-To push the latest commits to the remote repository:
-
-```bash
-git add .
-git commit -m "Release: Update features"
-git push origin main
-```
-
-### Release Process
-
-1. Check git status: `git status`
-2. Stage changes: `git add .`
-3. Commit with release message: `git commit -m "Release v1.0.0"`
-4. Push to remote: `git push origin main`
-5. Create tag: `git tag v1.0.0 && git push --tags`
-
-## Commands
-
-### Push Latest Commits
-
-```bash
-# Stage all changes
-git add .
-
-# Commit with a release message
-git commit -m "Release: Latest updates"
-
-# Push to remote
-git push origin main
-```
-
-### Create Release Tag
-
-```bash
-# Create annotated tag
-git tag -a v1.0.0 -m "Release version 1.0.0"
-
-# Push tag to remote
-git push origin v1.0.0
-```
-
-## Best Practices
-
-- Always check `git status` before pushing
-- Use descriptive commit messages
-- Tag releases with semantic versioning (e.g., v1.0.0)
-- Push tags separately after commits
-- Ensure CI/CD pipelines are triggered by pushes
-
-## Error Handling
-
-If push fails due to conflicts:
-1. Pull latest changes: `git pull origin main`
-2. Resolve conflicts
-3. Commit and push again
-
-## Integration
-
-This skill can be integrated with CI/CD pipelines to automate release processes upon successful builds.
+4. **Prepare Release Command** 
+   Provide ready-to-run command: 
+   ```bash
+   gh release create vX.Y.Z --title "vX.Y.Z" --notes-file changelog.md
