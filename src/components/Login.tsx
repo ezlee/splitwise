@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { Lock, Mail, ArrowRight } from 'lucide-react';
+import { GoogleLogin } from '@react-oauth/google';
 
 export const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -24,6 +25,32 @@ export const Login = () => {
       navigate('/');
     } else {
       setError('Invalid email or password');
+    }
+  };
+
+  const handleGoogleLogin = (credentialResponse: any) => {
+    try {
+      const token = credentialResponse.credential;
+      // Decode the JWT token (simplified - in production, you'd want to verify this on a backend)
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map(function (c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+          })
+          .join('')
+      );
+
+      const payload = JSON.parse(jsonPayload);
+      loginWithGoogle({
+        email: payload.email,
+        name: payload.name,
+      });
+      navigate('/');
+    } catch (error) {
+      setError('Failed to sign in with Google');
     }
   };
 
@@ -87,6 +114,19 @@ export const Login = () => {
               <ArrowRight className="w-4 h-4" />
             </button>
           </form>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-2 bg-white dark:bg-gray-800 text-gray-500">Or continue with</span>
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <GoogleLogin onSuccess={handleGoogleLogin} onError={() => setError('Failed to sign in with Google')} />
+          </div>
 
           <div className="mt-6 text-center">
             <p className="text-gray-600 dark:text-gray-400">

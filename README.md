@@ -4,6 +4,8 @@ A modern bill-splitting application built with React, TypeScript, and TailwindCS
 
 ## Features
 
+- ✅ **Authentication**: Sign up and login with email/password or Google OAuth
+- ✅ **Protected Routes**: Secure dashboard and features for authenticated users only
 - ✅ **Expense Management**: Add, view, and delete expenses
 - ✅ **Smart Splitting**: Split expenses equally among multiple people
 - ✅ **Balance Tracking**: Real-time balance calculations for all users
@@ -16,8 +18,10 @@ A modern bill-splitting application built with React, TypeScript, and TailwindCS
 - **Frontend**: React 18 with TypeScript
 - **Styling**: TailwindCSS with custom components
 - **Icons**: Lucide React
+- **Authentication**: Google OAuth & Email/Password
 - **Build Tool**: Vite
 - **State Management**: React hooks (useState, useEffect)
+- **Routing**: React Router DOM
 
 ## Getting Started
 
@@ -39,12 +43,23 @@ cd splitwise
 npm install
 ```
 
-3. Start the development server:
+3. Set up Google OAuth (optional):
+   - Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+   - Create a new OAuth 2.0 client ID
+   - Add `http://localhost:5173` as authorized JavaScript origin
+   - Copy your Client ID
+   - Create a `.env` file in the root directory:
+     ```env
+     VITE_GOOGLE_CLIENT_ID=your_google_client_id_here
+     ```
+   - Or use `.env.example` as a template
+
+4. Start the development server:
 ```bash
 npm run dev
 ```
 
-4. Open your browser and navigate to `http://localhost:5173`
+5. Open your browser and navigate to `http://localhost:5173`
 
 ## Usage
 

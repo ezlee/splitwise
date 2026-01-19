@@ -11,6 +11,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (email: string, password: string) => boolean;
   signup: (name: string, email: string, password: string) => boolean;
+  loginWithGoogle: (googleUser: any) => void;
   logout: () => void;
 }
 
@@ -105,8 +106,35 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     localStorage.removeItem(STORAGE_KEY_CURRENT_USER);
   };
 
+  const loginWithGoogle = (googleUser: any) => {
+    const googleEmail = googleUser.email;
+    const googleName = googleUser.name;
+
+    // Check if user already exists in our system
+    let existingUser = findUserByEmail(googleEmail);
+
+    if (!existingUser) {
+      // Create new user if it doesn't exist
+      existingUser = {
+        id: `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        email: googleEmail,
+        name: googleName,
+      };
+
+      // Save user to users list
+      const users = getUsers();
+      users.push(existingUser);
+      saveUsers(users);
+    }
+
+    // Set user session
+    setUser(existingUser);
+    setIsAuthenticated(true);
+    localStorage.setItem(STORAGE_KEY_CURRENT_USER, JSON.stringify(existingUser));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, signup, logout }}>
+    <AuthContext.Provider value={{ user, isAuthenticated, login, signup, loginWithGoogle, logout }}>
       {children}
     </AuthContext.Provider>
   );
